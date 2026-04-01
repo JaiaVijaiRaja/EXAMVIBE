@@ -101,13 +101,21 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     });
     
     if (error) {
+      console.error('Edge Function Invocation Error:', error);
       let message = error.message;
+      
       // Try to parse the error message if it's a JSON string from the Edge Function
-      try {
-        const body = await error.context.json();
-        if (body && body.error) message = body.error;
-      } catch (e) {
-        // If it's not JSON or parsing fails, use the default error message
+      if (error.context) {
+        try {
+          const body = await error.context.json();
+          if (body && body.error) message = body.error;
+        } catch (e) {
+          // If parsing fails, try to get text
+          try {
+            const text = await error.context.text();
+            if (text) message = text;
+          } catch (e2) {}
+        }
       }
       throw new Error(message);
     }

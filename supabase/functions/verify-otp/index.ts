@@ -12,13 +12,24 @@ export default async function handler(req: Request) {
   }
 
   try {
-    // Initialize Supabase client with the Service Role key to bypass RLS for the OTP table
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase environment variables')
+      return new Response(JSON.stringify({ error: 'Server configuration error: Missing Supabase keys' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
 
-    const { email, type, otp } = await req.json()
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+
+    const body = await req.json().catch(() => ({}))
+    const { email, type, otp } = body
+
+    console.log(`[LOG] Request: ${type} for ${email}, OTP: ${!!otp}`)
 
     if (!email || !type) {
       return new Response(JSON.stringify({ error: 'Email and type are required' }), {
@@ -29,8 +40,9 @@ export default async function handler(req: Request) {
 
     if (otp) {
       // ==========================================
-      // VERIFY OTP
+      // VERIFY OTP AND GENERATE SESSION
       // ==========================================
+      console.log('[LOG] Verifying OTP in database...')
       const { data: otpData, error: otpError } = await supabaseClient
         .from('otp_verifications')
         .select('*')
@@ -44,7 +56,8 @@ export default async function handler(req: Request) {
         .single()
 
       if (otpError || !otpData) {
-        return new Response(JSON.stringify({ error: 'Invalid or expired OTP' }), {
+        console.error('[ERROR] OTP Verification Failed:', otpError)
+        return new Response(JSON.stringify({ error: 'Invalid or expired OTP. Please request a new one.' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
@@ -56,64 +69,93 @@ export default async function handler(req: Request) {
         .update({ verified: true })
         .eq('id', otpData.id)
 
-      // Generate a login session for the user
-      // If it's a signup, we might need to create the user first if they don't exist
+      console.log('[LOG] OTP verified. Ensuring user exists...')
+
+      // Ensure user exists and is confirmed
       if (type === 'signup') {
         const { data: user, error: userError } = await supabaseClient.auth.admin.createUser({
           email,
           email_confirm: true,
           user_metadata: { signup_via_otp: true }
         })
-        if (userError && !userError.message.includes('already registered')) {
-          console.error('User Creation Error:', userError)
-          return new Response(JSON.stringify({ error: 'Failed to create user' }), {
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          })
+        if (userError) {
+          if (userError.message.includes('already registered')) {
+            console.log('[LOG] User already exists, ensuring they are confirmed...')
+            // Force confirm if they exist but aren't confirmed
+            await supabaseClient.auth.admin.updateUserById((await supabaseClient.auth.admin.getUserByEmail(email)).data.user!.id, {
+              email_confirm: true
+            })
+          } else {
+            console.error('[ERROR] User Creation Error:', userError)
+            return new Response(JSON.stringify({ error: `Auth Error: ${userError.message}` }), {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            })
+          }
         }
       } else if (type === 'reset') {
-        // For reset, verify user exists
         const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserByEmail(email)
         if (userError || !userData.user) {
-          return new Response(JSON.stringify({ error: 'User not found' }), {
+          console.error('[ERROR] User Lookup Error:', userError)
+          return new Response(JSON.stringify({ error: 'Account not found for this email.' }), {
             status: 404,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           })
         }
       }
 
-      // Generate a recovery or signup link to get a session
-      const { data: linkData, error: linkError } = await supabaseClient.auth.admin.generateLink({
-        type: type === 'signup' ? 'signup' : 'recovery',
+      // Generate a session link
+      let linkType: 'signup' | 'recovery' | 'magiclink' = type === 'signup' ? 'signup' : 'recovery'
+      let actualLinkType: 'signup' | 'recovery' | 'magiclink' = linkType
+      
+      console.log(`[LOG] Generating link of type: ${linkType}`)
+      let { data: linkData, error: linkError } = await supabaseClient.auth.admin.generateLink({
+        type: linkType,
         email: email,
       })
 
+      // Fallback if user is already confirmed or other link issues
+      if (linkError && (linkError.message.includes('already confirmed') || type === 'signup')) {
+        console.log('[LOG] Signup/Recovery link failed, falling back to magiclink')
+        const result = await supabaseClient.auth.admin.generateLink({
+          type: 'magiclink',
+          email: email,
+        })
+        linkData = result.data
+        linkError = result.error
+        actualLinkType = 'magiclink'
+      }
+
       if (linkError || !linkData || !linkData.properties?.email_otp) {
-        console.error('Link Generation Error:', linkError)
-        return new Response(JSON.stringify({ error: 'Failed to generate session link' }), {
+        console.error('[ERROR] Link Generation Error:', linkError)
+        return new Response(JSON.stringify({ 
+          error: `Session link failed: ${linkError?.message || 'Unknown error'}. Please try logging in normally.` 
+        }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
-      // Use the generated OTP to get a session
+      // Exchange token for session
+      console.log(`[LOG] Exchanging token for session (Type: ${actualLinkType})...`)
       const { data: sessionData, error: sessionError } = await supabaseClient.auth.verifyOtp({
         email,
         token: linkData.properties.email_otp,
-        type: type === 'signup' ? 'signup' : 'recovery',
+        type: actualLinkType,
       })
 
       if (sessionError || !sessionData.session) {
-        console.error('Session Error:', sessionError)
-        return new Response(JSON.stringify({ error: 'Failed to create session' }), {
+        console.error('[ERROR] Session Exchange Error:', sessionError)
+        return new Response(JSON.stringify({ error: `Session creation failed: ${sessionError?.message || 'Unknown error'}` }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
+      console.log('[LOG] Session created successfully')
       return new Response(JSON.stringify({ 
         success: true, 
-        message: 'OTP verified successfully',
+        message: 'Verified successfully',
         session: {
           access_token: sessionData.session.access_token,
           refresh_token: sessionData.session.refresh_token,
@@ -128,13 +170,12 @@ export default async function handler(req: Request) {
       // ==========================================
       // GENERATE AND SEND OTP
       // ==========================================
+      console.log('[LOG] Generating new OTP...')
       
-      // Generate 8-digit OTP
       const generatedOtp = Math.floor(10000000 + Math.random() * 90000000).toString()
-      // Set expiration to 10 minutes from now
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString()
 
-      // Store OTP in database
+      console.log('[LOG] Storing OTP...')
       const { error: dbError } = await supabaseClient
         .from('otp_verifications')
         .insert({
@@ -146,19 +187,34 @@ export default async function handler(req: Request) {
         })
 
       if (dbError) {
-        console.error('Database Error:', dbError)
-        throw new Error('Failed to store OTP')
+        console.error('[ERROR] DB Insert Error:', dbError)
+        return new Response(JSON.stringify({ error: `Database error: ${dbError.message}` }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
 
-      // Send email via Brevo API
       const brevoApiKey = Deno.env.get('BREVO_API_KEY')
-      const senderEmail = Deno.env.get('BREVO_SENDER_EMAIL') || 'noreply@examvibe.com'
+      const senderEmail = Deno.env.get('BREVO_SENDER_EMAIL')
       const senderName = Deno.env.get('BREVO_SENDER_NAME') || 'ExamVibe'
 
       if (!brevoApiKey) {
-        throw new Error('BREVO_API_KEY is not set')
+        console.error('[ERROR] BREVO_API_KEY is missing')
+        return new Response(JSON.stringify({ error: 'Email service not configured (Missing API Key)' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
 
+      if (!senderEmail) {
+        console.error('[ERROR] BREVO_SENDER_EMAIL is missing')
+        return new Response(JSON.stringify({ error: 'Email service not configured (Missing Sender Email)' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      console.log(`[LOG] Sending Brevo email to ${email} from ${senderEmail}...`)
       const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
@@ -177,7 +233,7 @@ export default async function handler(req: Request) {
               <div style="background-color: #f4f6f8; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; border-radius: 8px; margin: 30px 0; color: #2563eb;">
                 ${generatedOtp}
               </div>
-              <p style="color: #ef4444; font-weight: bold; text-align: center;">Warning: This code will expire in 5 minutes.</p>
+              <p style="color: #ef4444; font-weight: bold; text-align: center;">Warning: This code will expire in 10 minutes.</p>
               <p style="color: #777; font-size: 14px; text-align: center; margin-top: 30px;">If you did not request this code, please ignore this email.</p>
             </div>
           `
@@ -186,15 +242,16 @@ export default async function handler(req: Request) {
 
       if (!brevoResponse.ok) {
         const errText = await brevoResponse.text()
-        console.error('Brevo API Error:', errText)
+        console.error('[ERROR] Brevo API Error:', errText)
         return new Response(JSON.stringify({ 
-          error: `Email service error: ${errText.includes('sender') ? 'Invalid sender email' : 'Check API key or quota'}` 
+          error: `Email delivery failed. Please check if the sender email is verified in Brevo.` 
         }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
+      console.log('[LOG] OTP sent successfully')
       return new Response(JSON.stringify({ success: true, message: 'OTP sent successfully' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
