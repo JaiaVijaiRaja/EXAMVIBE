@@ -99,7 +99,18 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const { data, error } = await supabase.functions.invoke('verify-otp', {
       body: payload,
     });
-    if (error) throw error;
+    
+    if (error) {
+      let message = error.message;
+      // Try to parse the error message if it's a JSON string from the Edge Function
+      try {
+        const body = await error.context.json();
+        if (body && body.error) message = body.error;
+      } catch (e) {
+        // If it's not JSON or parsing fails, use the default error message
+      }
+      throw new Error(message);
+    }
     return data;
   };
 

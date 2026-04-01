@@ -88,19 +88,18 @@ export default async function handler(req: Request) {
         email: email,
       })
 
-      if (linkError || !linkData) {
+      if (linkError || !linkData || !linkData.properties?.email_otp) {
         console.error('Link Generation Error:', linkError)
-        return new Response(JSON.stringify({ error: 'Failed to generate session' }), {
+        return new Response(JSON.stringify({ error: 'Failed to generate session link' }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
-      // The link contains a hashed token. We can use verifyOtp to get a session
-      // Wait, verifyOtp with type='recovery' or 'signup' works!
+      // Use the generated OTP to get a session
       const { data: sessionData, error: sessionError } = await supabaseClient.auth.verifyOtp({
         email,
-        token: linkData.hashed_token,
+        token: linkData.properties.email_otp,
         type: type === 'signup' ? 'signup' : 'recovery',
       })
 
@@ -153,6 +152,9 @@ export default async function handler(req: Request) {
 
       // Send email via Brevo API
       const brevoApiKey = Deno.env.get('BREVO_API_KEY')
+      const senderEmail = Deno.env.get('BREVO_SENDER_EMAIL') || 'noreply@examvibe.com'
+      const senderName = Deno.env.get('BREVO_SENDER_NAME') || 'ExamVibe'
+
       if (!brevoApiKey) {
         throw new Error('BREVO_API_KEY is not set')
       }
@@ -165,7 +167,7 @@ export default async function handler(req: Request) {
           'api-key': brevoApiKey
         },
         body: JSON.stringify({
-          sender: { name: 'ExamVibe', email: 'noreply@examvibe.com' },
+          sender: { name: senderName, email: senderEmail },
           to: [{ email }],
           subject: 'Your ExamVibe Verification Code',
           htmlContent: `
@@ -185,7 +187,12 @@ export default async function handler(req: Request) {
       if (!brevoResponse.ok) {
         const errText = await brevoResponse.text()
         console.error('Brevo API Error:', errText)
-        throw new Error('Failed to send email')
+        return new Response(JSON.stringify({ 
+          error: `Email service error: ${errText.includes('sender') ? 'Invalid sender email' : 'Check API key or quota'}` 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
 
       return new Response(JSON.stringify({ success: true, message: 'OTP sent successfully' }), {
