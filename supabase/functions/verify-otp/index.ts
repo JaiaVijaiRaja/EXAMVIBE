@@ -17,7 +17,7 @@ export default async function handler(req: Request) {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
     if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing Supabase environment variables')
+      console.error('[ERROR] Missing Supabase environment variables')
       return new Response(JSON.stringify({ error: 'Server configuration error: Missing Supabase keys' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -69,34 +69,44 @@ export default async function handler(req: Request) {
         .update({ verified: true })
         .eq('id', otpData.id)
 
-      console.log('[LOG] OTP verified. Ensuring user exists...')
+      console.log('[LOG] OTP verified. Ensuring user exists and is confirmed...')
 
-      // Ensure user exists and is confirmed
+      // Get existing user if any
+      const { data: userData } = await supabaseClient.auth.admin.getUserByEmail(email)
+      let user = userData?.user
+
       if (type === 'signup') {
-        const { data: user, error: userError } = await supabaseClient.auth.admin.createUser({
-          email,
-          email_confirm: true,
-          user_metadata: { signup_via_otp: true }
-        })
-        if (userError) {
-          if (userError.message.includes('already registered')) {
-            console.log('[LOG] User already exists, ensuring they are confirmed...')
-            // Force confirm if they exist but aren't confirmed
-            await supabaseClient.auth.admin.updateUserById((await supabaseClient.auth.admin.getUserByEmail(email)).data.user!.id, {
-              email_confirm: true
+        if (!user) {
+          console.log('[LOG] Creating new user...')
+          const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
+            email,
+            email_confirm: true,
+            user_metadata: { signup_via_otp: true }
+          })
+          if (createError) {
+            console.error('[ERROR] User Creation Error:', createError)
+            return new Response(JSON.stringify({ error: `Auth Error: ${createError.message}` }), {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             })
-          } else {
-            console.error('[ERROR] User Creation Error:', userError)
-            return new Response(JSON.stringify({ error: `Auth Error: ${userError.message}` }), {
+          }
+          user = newUser.user
+        } else if (!user.email_confirmed_at) {
+          console.log('[LOG] Confirming existing user...')
+          const { error: confirmError } = await supabaseClient.auth.admin.updateUserById(user.id, {
+            email_confirm: true
+          })
+          if (confirmError) {
+            console.error('[ERROR] User Confirmation Error:', confirmError)
+            return new Response(JSON.stringify({ error: `Failed to confirm user: ${confirmError.message}` }), {
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             })
           }
         }
       } else if (type === 'reset') {
-        const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserByEmail(email)
-        if (userError || !userData.user) {
-          console.error('[ERROR] User Lookup Error:', userError)
+        if (!user) {
+          console.error('[ERROR] User not found for reset')
           return new Response(JSON.stringify({ error: 'Account not found for this email.' }), {
             status: 404,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
