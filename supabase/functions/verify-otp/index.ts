@@ -31,7 +31,7 @@ export default async function handler(req: Request) {
       // ==========================================
       // VERIFY OTP
       // ==========================================
-      const { data, error } = await supabaseClient
+      const { data: otpData, error: otpError } = await supabaseClient
         .from('otp_verifications')
         .select('*')
         .eq('email', email)
@@ -43,7 +43,7 @@ export default async function handler(req: Request) {
         .limit(1)
         .single()
 
-      if (error || !data) {
+      if (otpError || !otpData) {
         return new Response(JSON.stringify({ error: 'Invalid or expired OTP' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -54,9 +54,73 @@ export default async function handler(req: Request) {
       await supabaseClient
         .from('otp_verifications')
         .update({ verified: true })
-        .eq('id', data.id)
+        .eq('id', otpData.id)
 
-      return new Response(JSON.stringify({ success: true, message: 'OTP verified successfully' }), {
+      // Generate a login session for the user
+      // If it's a signup, we might need to create the user first if they don't exist
+      if (type === 'signup') {
+        const { data: user, error: userError } = await supabaseClient.auth.admin.createUser({
+          email,
+          email_confirm: true,
+          user_metadata: { signup_via_otp: true }
+        })
+        if (userError && !userError.message.includes('already registered')) {
+          console.error('User Creation Error:', userError)
+          return new Response(JSON.stringify({ error: 'Failed to create user' }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+      } else if (type === 'reset') {
+        // For reset, verify user exists
+        const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserByEmail(email)
+        if (userError || !userData.user) {
+          return new Response(JSON.stringify({ error: 'User not found' }), {
+            status: 404,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
+      // Generate a recovery or signup link to get a session
+      const { data: linkData, error: linkError } = await supabaseClient.auth.admin.generateLink({
+        type: type === 'signup' ? 'signup' : 'recovery',
+        email: email,
+      })
+
+      if (linkError || !linkData) {
+        console.error('Link Generation Error:', linkError)
+        return new Response(JSON.stringify({ error: 'Failed to generate session' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // The link contains a hashed token. We can use verifyOtp to get a session
+      // Wait, verifyOtp with type='recovery' or 'signup' works!
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.verifyOtp({
+        email,
+        token: linkData.hashed_token,
+        type: type === 'signup' ? 'signup' : 'recovery',
+      })
+
+      if (sessionError || !sessionData.session) {
+        console.error('Session Error:', sessionError)
+        return new Response(JSON.stringify({ error: 'Failed to create session' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'OTP verified successfully',
+        session: {
+          access_token: sessionData.session.access_token,
+          refresh_token: sessionData.session.refresh_token,
+          user: sessionData.session.user
+        }
+      }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

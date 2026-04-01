@@ -95,6 +95,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
+  const callOtpFunction = async (payload: { email: string; type: 'signup' | 'reset'; otp?: string }) => {
+    const { data, error } = await supabase.functions.invoke('verify-otp', {
+      body: payload,
+    });
+    if (error) throw error;
+    return data;
+  };
+
   const handleSignupInfo = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -120,26 +128,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         return;
       }
 
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: cleanEmail,
-        options: {
-          shouldCreateUser: true,
-          data: {
-            name: name.trim(),
-            major: major,
-          }
-        },
-      });
-
-      if (otpError) {
-        if (otpError.message.toLowerCase().includes('rate limit')) {
-          showError('Rate limit exceeded. Please check your email for a previously sent code, or wait an hour.');
-          setSignupStep('verify');
-          setLoading(false);
-          return;
-        }
-        throw otpError;
-      }
+      // Call our custom Edge Function to send OTP via Brevo
+      await callOtpFunction({ email: cleanEmail, type: 'signup' });
       
       setSignupStep('verify');
     } catch (err: any) {
@@ -161,31 +151,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     setLoading(true);
     try {
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: cleanEmail,
-        options: {
-          shouldCreateUser: false
-        }
-      });
-
-      if (otpError) {
-        if (otpError.message.toLowerCase().includes('rate limit')) {
-          showError('Rate limit exceeded. Please check your email for a previously sent code, or wait an hour.');
-          setForgotStep('verify');
-          setLoading(false);
-          return;
-        }
-        if (otpError.message.toLowerCase().includes('signups not allowed') || otpError.message.toLowerCase().includes('user not found')) {
-          showError('You need to sign up first');
-          setLoading(false);
-          return;
-        }
-        throw otpError;
-      }
+      // Call our custom Edge Function to send OTP via Brevo
+      await callOtpFunction({ email: cleanEmail, type: 'reset' });
       
       setForgotStep('verify');
     } catch (err: any) {
-      showError(err.message || 'Failed to send verification code.');
+      if (err.message?.toLowerCase().includes('user not found')) {
+        showError('You need to sign up first');
+      } else {
+        showError(err.message || 'Failed to send verification code.');
+      }
     } finally {
       setLoading(false);
     }
@@ -197,15 +172,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
 
     const cleanEmail = email.toLowerCase().trim();
+    const type = authMode === 'forgot-password' ? 'reset' : 'signup';
 
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: cleanEmail,
-        token: otp,
-        type: 'email',
-      });
+      // Call our custom Edge Function to verify OTP
+      const data = await callOtpFunction({ email: cleanEmail, type, otp });
 
-      if (verifyError) throw verifyError;
+      if (data.session) {
+        // Set the session returned by the edge function
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+        if (sessionError) throw sessionError;
+      } else {
+        throw new Error('Failed to create session');
+      }
 
       // OTP verified, move to password setup
       if (authMode === 'forgot-password') {
@@ -214,7 +196,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         setSignupStep('password');
       }
     } catch (err: any) {
-      showError('Invalid or expired verification code. Please try again.');
+      showError(err.message || 'Invalid or expired verification code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -232,7 +214,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
     try {
       const { error: updateError } = await supabase.auth.updateUser({
-        password: password
+        password: password,
+        data: {
+          name: name.trim(),
+          major: major,
+        }
       });
 
       if (updateError) throw updateError;
