@@ -285,7 +285,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center bg-cover bg-center p-4 relative overflow-hidden transition-all duration-700"
+      className="min-h-screen flex items-center justify-center bg-[#1A0B2E] bg-cover bg-center p-4 relative overflow-hidden transition-all duration-700"
       style={{ backgroundImage: getBackgroundImage(), fontFamily: "'Poppins', sans-serif" }}
     >
       <div className="max-w-[400px] w-full bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 relative z-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-white overflow-hidden">
