@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
+import { DailyStreakWidget } from './DailyStreakWidget';
 import { ViewType, User, AppProgress } from '../types';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 
@@ -139,6 +140,14 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
 
           <div className="flex items-center gap-4">
+            <DailyStreakWidget
+              onUpdateProgress={onUpdateProgress}
+              currentGlobalStreak={progress.streaks}
+              bestStreak={progress.bestStreak}
+              userEmail={user.email}
+              isDataLoaded={isDataLoaded}
+            />
+
             {/* Theme Toggle Button */}
             <button
               onClick={handleThemeToggle}

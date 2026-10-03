@@ -15,7 +15,7 @@ import {
   Info
 } from 'lucide-react';
 import { ViewType, AppProgress } from '../types';
-import { DailyStreakWidget } from './DailyStreakWidget';
+
 
 interface SidebarProps {
   currentView: ViewType;
@@ -89,23 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, pro
           })}
         </div>
 
-        <div className="pt-8 mt-8">
-          <div className="flex items-center justify-between px-2 mb-4">
-            <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-70">
-              Performance
-            </h2>
-            <span className="text-[9px] font-black text-blue-500 uppercase tracking-tighter">System v2.0</span>
-          </div>
-          <div className="px-1">
-            <DailyStreakWidget 
-              onUpdateProgress={onUpdateProgress} 
-              currentGlobalStreak={progress.streaks} 
-              bestStreak={progress.bestStreak}
-              userEmail={userEmail} 
-              isDataLoaded={isDataLoaded}
-            />
-          </div>
-        </div>
+
       </nav>
 
       <div className="px-6 pt-6 mt-4 shrink-0">
