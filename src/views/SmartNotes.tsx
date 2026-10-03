@@ -23,16 +23,16 @@ const CollapsibleSection = ({ title, children }: { title: string, children: Reac
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="mb-6 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800">
+    <div className="mb-6 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-white/5 dark:backdrop-blur-md">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-l-4 border-l-blue-500"
+        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 dark:backdrop-blur-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-l-4 border-l-blue-500"
       >
         <h2 className="text-xl font-bold text-slate-900 dark:text-white m-0">{title}</h2>
         {isOpen ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
       </button>
       {isOpen && (
-        <div className="p-6 border-t border-slate-200 dark:border-slate-700">
+        <div className="p-6 border-t border-slate-200 dark:border-white/10">
           {children}
         </div>
       )}
@@ -139,7 +139,7 @@ export const SmartNotes: React.FC<SmartNotesProps> = ({ progress, onUpdateProgre
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Transform complex engineering concepts into clear, structured notes.</p>
       </header>
 
-      <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 animate-fadeIn">
+      <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-5 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Engineering Topic</label>
@@ -148,7 +148,7 @@ export const SmartNotes: React.FC<SmartNotesProps> = ({ progress, onUpdateProgre
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="e.g. Distributed Systems Architecture"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-base"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-base"
             />
           </div>
           
@@ -180,8 +180,8 @@ export const SmartNotes: React.FC<SmartNotesProps> = ({ progress, onUpdateProgre
       </div>
 
       {notes && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden animate-fadeIn">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 gap-4">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-700/50 gap-4">
             <h3 className="font-bold flex items-center gap-2 text-slate-900 dark:text-white text-sm sm:text-base">
               <FileText className="w-5 h-5 text-blue-500 shrink-0" /> Study Notes: {topic}
             </h3>
@@ -192,7 +192,7 @@ export const SmartNotes: React.FC<SmartNotesProps> = ({ progress, onUpdateProgre
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
                   isCompleted 
                     ? 'bg-emerald-100 text-emerald-700 cursor-default' 
-                    : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
+                    : 'bg-white dark:bg-white/5 dark:backdrop-blur-md border-2 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
                 }`}
               >
                 <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'text-emerald-600' : ''}`} />
@@ -203,7 +203,7 @@ export const SmartNotes: React.FC<SmartNotesProps> = ({ progress, onUpdateProgre
                   <button className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors min-h-[36px]">
                     <Download className="w-4 h-4" /> Export
                   </button>
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-10">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-xl shadow-xl border border-slate-200 dark:border-white/10 py-2 opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-10">
                     <button 
                       onClick={() => exportToMarkdown(`notes-${topic.replace(/\s+/g, '-').toLowerCase()}`, generateNotesMarkdown(topic, notes))}
                       className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

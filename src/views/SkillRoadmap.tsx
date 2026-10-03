@@ -116,7 +116,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
         {roadmap.length > 0 && (
           <button 
             onClick={clearRoadmap}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-slate-800 rounded-lg min-h-[40px]"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-white/5 dark:backdrop-blur-md rounded-lg min-h-[40px]"
           >
             <RefreshCw className="w-4 h-4" /> Reset Roadmap
           </button>
@@ -124,7 +124,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
       </header>
 
       {roadmap.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 animate-fadeIn">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             <div className="md:col-span-1">
               <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Target Skill</label>
@@ -133,7 +133,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
                 value={skill}
                 onChange={(e) => setSkill(e.target.value)}
                 placeholder="e.g. AWS Cloud, React, FPGA"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none text-base min-h-[44px]"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none text-base min-h-[44px]"
               />
             </div>
             <div className="md:col-span-1">
@@ -141,7 +141,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
               <select 
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none text-base min-h-[44px] appearance-none"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none text-base min-h-[44px] appearance-none"
               >
                 <option>Beginner</option>
                 <option>Intermediate</option>
@@ -155,7 +155,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
                 placeholder="e.g. Land a job, Build a drone"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none text-base min-h-[44px]"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none text-base min-h-[44px]"
               />
             </div>
           </div>
@@ -185,11 +185,11 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
             return (
               <div 
                 key={item.week} 
-                className={`group relative bg-white dark:bg-slate-800 rounded-2xl border overflow-hidden shadow-sm flex flex-col md:flex-row transition-all ${isDone ? 'border-emerald-500/50 opacity-80' : 'border-slate-200 dark:border-slate-700'}`}
+                className={`group relative bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-2xl border overflow-hidden shadow-sm flex flex-col md:flex-row transition-all ${isDone ? 'border-emerald-500/50 opacity-80' : 'border-slate-200 dark:border-white/10'}`}
               >
                 <div 
                   onClick={() => handleToggleClick(item)}
-                  className={`md:w-32 p-6 flex flex-row md:flex-col items-center justify-between md:justify-center border-b md:border-b-0 md:border-r transition-colors cursor-pointer min-h-[60px] ${isDone ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-700/50 border-slate-100 dark:border-slate-700'}`}
+                  className={`md:w-32 p-6 flex flex-row md:flex-col items-center justify-between md:justify-center border-b md:border-b-0 md:border-r transition-colors cursor-pointer min-h-[60px] ${isDone ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-700/50 border-slate-100 dark:border-white/10'}`}
                 >
                   <div className="flex flex-col items-center">
                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Week</span>
@@ -219,7 +219,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-white/10">
                     <div>
                       <h4 className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-3">
                         <Link className="w-3.5 h-3.5" /> Resources

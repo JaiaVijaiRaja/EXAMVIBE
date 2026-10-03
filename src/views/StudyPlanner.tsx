@@ -92,7 +92,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
               <button className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors min-h-[44px]">
                 <Download className="w-4 h-4" /> Export
               </button>
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-10">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-xl shadow-xl border border-slate-200 dark:border-white/10 py-2 opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-10">
                 <button 
                   onClick={() => exportToMarkdown(`study-plan-${subjects.replace(/\s+/g, '-').toLowerCase()}`, generateStudyPlanMarkdown(subjects, examDate, plan))}
                   className="w-full text-left px-4 py-3 sm:py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors min-h-[44px] sm:min-h-0"
@@ -118,7 +118,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
       </header>
 
       {plan.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 animate-fadeIn">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Subjects (comma separated)</label>
@@ -127,7 +127,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
                 onChange={(e) => setSubjects(e.target.value)}
                 placeholder="e.g. Fluid Mechanics, Strength of Materials, Digital Electronics"
                 rows={3}
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-base"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-base"
               />
             </div>
             <div className="flex flex-col justify-between gap-4">
@@ -137,7 +137,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
                   type="date" 
                   value={examDate}
                   onChange={(e) => setExamDate(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-base"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-base"
                 />
               </div>
               <button 
@@ -155,7 +155,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
         <>
           <div id="planner-container" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-fadeIn">
             {plan.map((day, idx) => (
-            <div key={idx} className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div key={idx} className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
               <div className="flex items-center gap-2 mb-4 text-blue-600 dark:text-blue-400 font-bold">
                 <Calendar className="w-5 h-5" />
                 {day.day}
@@ -195,12 +195,12 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
           </div>
 
           {/* Hidden list for PDF export */}
-          <div id="planner-pdf" className="sr-only-export p-8 bg-white dark:bg-slate-800">
+          <div id="planner-pdf" className="sr-only-export p-8 bg-white dark:bg-white/5 dark:backdrop-blur-md">
             <h2 className="text-2xl font-bold mb-4">AI Study Plan</h2>
             <p className="text-slate-600 mb-8">Subjects: {subjects} | Exam Date: {examDate}</p>
             <div className="space-y-8">
               {plan.map((day, idx) => (
-                <div key={idx} className="pb-6 border-b border-slate-100 dark:border-slate-700">
+                <div key={idx} className="pb-6 border-b border-slate-100 dark:border-white/10">
                   <h3 className="text-xl font-bold text-blue-600 mb-4">{day.day}</h3>
                   <ul className="space-y-2">
                     {day.tasks.map((task, tidx) => (

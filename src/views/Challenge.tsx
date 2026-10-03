@@ -87,7 +87,7 @@ export const Challenge: React.FC<ChallengeProps> = ({ progress, onUpdateProgress
         {days.length > 0 && (
           <button 
             onClick={clearChallenge}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-slate-800 rounded-lg min-h-[40px]"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-white/5 dark:backdrop-blur-md rounded-lg min-h-[40px]"
           >
             <RefreshCw className="w-4 h-4" /> Reset Challenge
           </button>
@@ -95,7 +95,7 @@ export const Challenge: React.FC<ChallengeProps> = ({ progress, onUpdateProgress
       </header>
 
       {days.length === 0 ? (
-        <div className="max-w-xl mx-auto bg-white dark:bg-slate-800 p-6 sm:p-10 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 text-center animate-fadeIn">
+        <div className="max-w-xl mx-auto bg-white dark:bg-white/5 dark:backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-2xl border border-slate-100 dark:border-white/10 text-center animate-fadeIn">
           <div className="p-4 bg-yellow-500/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
             <Trophy className="w-10 h-10 text-yellow-500 drop-shadow-lg" />
           </div>
@@ -108,7 +108,7 @@ export const Challenge: React.FC<ChallengeProps> = ({ progress, onUpdateProgress
               value={skill}
               onChange={(e) => setSkill(e.target.value)}
               placeholder="e.g. Docker Basics, Python Pandas"
-              className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-yellow-500 outline-none text-base min-h-[48px]"
+              className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-yellow-500 outline-none text-base min-h-[48px]"
             />
             <button 
               onClick={handleGenerate}
@@ -138,7 +138,7 @@ export const Challenge: React.FC<ChallengeProps> = ({ progress, onUpdateProgress
                     group relative flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-2xl border transition-all cursor-pointer
                     ${isDone 
                       ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800' 
-                      : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-yellow-300 dark:hover:border-yellow-800 shadow-sm'}
+                      : 'bg-white dark:bg-white/5 dark:backdrop-blur-md border-slate-100 dark:border-white/10 hover:border-yellow-300 dark:hover:border-yellow-800 shadow-sm'}
                   `}
                   onClick={() => toggleComplete(d.day)}
                 >

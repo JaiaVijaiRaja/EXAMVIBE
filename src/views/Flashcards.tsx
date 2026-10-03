@@ -134,7 +134,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
               <button className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors min-h-[44px]">
                 <Download className="w-4 h-4" /> Export
               </button>
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-10">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-xl shadow-xl border border-slate-200 dark:border-white/10 py-2 opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-10">
                 <button 
                   onClick={() => exportToMarkdown(`flashcards-${selectedTopics.join('-').toLowerCase()}`, generateFlashcardsMarkdown(selectedTopics, flashcards))}
                   className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
@@ -161,7 +161,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
         >
           <div className={`relative w-full h-full transition-all duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
             {/* Front */}
-            <div className="absolute inset-0 w-full h-full backface-hidden bg-slate-900 dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-700 dark:border-slate-700 flex flex-col items-center justify-center p-6 sm:p-8 text-center">
+            <div className="absolute inset-0 w-full h-full backface-hidden bg-slate-900 dark:bg-black/40 dark:backdrop-blur-md rounded-2xl shadow-xl border border-slate-700 dark:border-white/10 flex flex-col items-center justify-center p-6 sm:p-8 text-center">
               <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-4">Question</span>
               <div className="text-lg sm:text-2xl font-bold text-white leading-tight prose prose-invert max-w-none
                 prose-p:m-0 prose-p:leading-tight
@@ -177,7 +177,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
             </div>
 
             {/* Back */}
-            <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-slate-800 dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-700 dark:border-slate-800 flex flex-col items-center justify-center p-6 sm:p-8 text-center overflow-y-auto">
+            <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-slate-800 dark:bg-black/50 dark:backdrop-blur-xl rounded-2xl shadow-xl border border-slate-700 dark:border-white/10 flex flex-col items-center justify-center p-6 sm:p-8 text-center overflow-y-auto">
               <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-4">Answer</span>
               <div className="text-base sm:text-lg text-slate-200 leading-relaxed prose prose-invert max-w-none
                 prose-p:m-0 prose-p:leading-relaxed
@@ -201,7 +201,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
           <button 
             onClick={prevCard}
             disabled={currentIndex === 0}
-            className="p-4 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-colors shadow-sm min-h-[56px] min-w-[56px] flex items-center justify-center"
+            className="p-4 rounded-full bg-white dark:bg-white/5 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-colors shadow-sm min-h-[56px] min-w-[56px] flex items-center justify-center"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -214,20 +214,20 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
           <button 
             onClick={nextCard}
             disabled={currentIndex === flashcards.length - 1}
-            className="p-4 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-colors shadow-sm min-h-[56px] min-w-[56px] flex items-center justify-center"
+            className="p-4 rounded-full bg-white dark:bg-white/5 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 disabled:opacity-30 hover:bg-slate-50 transition-colors shadow-sm min-h-[56px] min-w-[56px] flex items-center justify-center"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-center">
+        <div className="pt-6 border-t border-slate-200 dark:border-white/10 flex justify-center">
           <button 
             onClick={() => !isCompleted && setShowQuiz(true)}
             disabled={isCompleted}
             className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold transition-all min-h-[44px] ${
               isCompleted 
                 ? 'bg-emerald-100 text-emerald-700 cursor-default' 
-                : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
+                : 'bg-white dark:bg-white/5 dark:backdrop-blur-md border-2 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
             }`}
           >
             <CheckCircle2 className={`w-5 h-5 ${isCompleted ? 'text-emerald-600' : ''}`} />
@@ -236,11 +236,11 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
         </div>
 
         {/* Hidden list for PDF export */}
-        <div id="flashcards-list" className="sr-only-export p-8 bg-white dark:bg-slate-800">
+        <div id="flashcards-list" className="sr-only-export p-8 bg-white dark:bg-white/5 dark:backdrop-blur-md">
           <h2 className="text-2xl font-bold mb-6">Flashcards: {selectedTopics.join(', ')}</h2>
           <div className="space-y-6">
             {flashcards.map((card, i) => (
-              <div key={i} className="pb-6 border-b border-slate-100 dark:border-slate-700">
+              <div key={i} className="pb-6 border-b border-slate-100 dark:border-white/10">
                 <p className="font-bold text-blue-600 mb-2">Q: {card.question}</p>
                 <p className="text-slate-700 dark:text-slate-300">A: {card.answer}</p>
               </div>
@@ -270,7 +270,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
       </header>
 
       {completedTopics.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 p-12 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-12 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
           <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-slate-400" />
           </div>
@@ -299,7 +299,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
                   className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between group ${
                     selectedTopics.includes(topic) 
                       ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' 
-                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300'
+                      : 'bg-white dark:bg-white/5 dark:backdrop-blur-md border-slate-200 dark:border-white/10 hover:border-blue-300'
                   }`}
                 >
                   <span className={`text-sm font-medium ${selectedTopics.includes(topic) ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300'}`}>
@@ -316,7 +316,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm sticky top-8">
+            <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm sticky top-8">
               <h3 className="font-bold text-slate-900 dark:text-white mb-4">Ready to Revise?</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                 We'll generate 10 targeted questions and answers based on your selected topics to help you lock in your knowledge.

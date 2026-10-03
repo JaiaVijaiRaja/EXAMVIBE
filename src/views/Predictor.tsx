@@ -16,16 +16,16 @@ const CollapsibleSection = ({ title, children }: { title: string, children: Reac
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="mb-6 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800">
+    <div className="mb-6 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-white/5 dark:backdrop-blur-md">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-l-4 border-l-blue-500"
+        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 dark:backdrop-blur-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-l-4 border-l-blue-500"
       >
         <h2 className="text-xl font-bold text-slate-900 dark:text-white m-0">{title}</h2>
         {isOpen ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
       </button>
       {isOpen && (
-        <div className="p-6 border-t border-slate-200 dark:border-slate-700">
+        <div className="p-6 border-t border-slate-200 dark:border-white/10">
           {children}
         </div>
       )}
@@ -130,7 +130,7 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">AI analysis of your syllabus to pinpoint high-probability exam topics.</p>
       </header>
 
-      <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 animate-fadeIn">
+      <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-5 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Subject</label>
@@ -139,7 +139,7 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. Signal Processing"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none text-base"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none text-base"
             />
           </div>
           <div>
@@ -149,7 +149,7 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
               onChange={(e) => setSyllabus(e.target.value)}
               placeholder="Paste the key modules or chapters from your syllabus..."
               rows={6}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none resize-none text-base"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none resize-none text-base"
             />
           </div>
           <button 
@@ -164,7 +164,7 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
       </div>
 
       {predictions && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border-2 border-amber-100 dark:border-amber-900/30 shadow-xl overflow-hidden animate-fadeIn">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-2xl border-2 border-amber-100 dark:border-amber-900/30 shadow-xl overflow-hidden animate-fadeIn">
           <div className="bg-amber-50 dark:bg-amber-900/20 px-5 sm:px-8 py-4 sm:py-6 border-b border-amber-100 dark:border-amber-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h3 className="text-lg sm:text-xl font-bold flex items-center gap-3 text-amber-800 dark:text-amber-400">
               <HelpCircle className="w-6 h-6 shrink-0" /> Likely Questions for {subject}
@@ -176,7 +176,7 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
                   isCompleted 
                     ? 'bg-emerald-100 text-emerald-700 cursor-default' 
-                    : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
+                    : 'bg-white dark:bg-white/5 dark:backdrop-blur-md border-2 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
                 }`}
               >
                 <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'text-emerald-600' : ''}`} />
@@ -226,7 +226,7 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
         />
       )}
 
-      <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 text-sm italic">
+      <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-white/5 dark:backdrop-blur-md rounded-lg text-slate-500 text-sm italic">
         <ListChecks className="w-5 h-5 shrink-0 mt-1" />
         Note: Predictions are based on syllabus structure and common engineering education patterns. Use this as a supplemental study guide alongside thorough preparation.
       </div>

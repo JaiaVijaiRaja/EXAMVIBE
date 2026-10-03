@@ -98,14 +98,14 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-8 sm:space-y-12">
       {editingStat && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700 animate-fadeIn">
+          <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
             <h3 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">Update {editingStat.label}</h3>
             <input 
               type="number" 
               step="any"
               value={editingStat.value}
               onChange={(e) => setEditingStat({ ...editingStat, value: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white mb-6 focus:ring-2 focus:ring-blue-500 outline-none text-lg min-h-[48px]"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white mb-6 focus:ring-2 focus:ring-blue-500 outline-none text-lg min-h-[48px]"
               autoFocus
             />
             <div className="flex justify-end gap-3">

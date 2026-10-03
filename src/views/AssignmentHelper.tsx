@@ -16,16 +16,16 @@ const CollapsibleSection = ({ title, children }: { title: string, children: Reac
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="mb-6 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800">
+    <div className="mb-6 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-white/5 dark:backdrop-blur-md">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-l-4 border-l-blue-500"
+        className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 dark:backdrop-blur-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-l-4 border-l-blue-500"
       >
         <h2 className="text-xl font-bold text-slate-900 dark:text-white m-0">{title}</h2>
         {isOpen ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
       </button>
       {isOpen && (
-        <div className="p-6 border-t border-slate-200 dark:border-slate-700">
+        <div className="p-6 border-t border-slate-200 dark:border-white/10">
           {children}
         </div>
       )}
@@ -130,7 +130,7 @@ export const AssignmentHelper: React.FC<AssignmentHelperProps> = ({ progress, on
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Get structured, conceptual answers for your engineering problems.</p>
       </header>
 
-      <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 animate-fadeIn">
+      <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-5 sm:p-6 rounded-xl shadow-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
         <div className="space-y-4">
           <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Paste your question below</label>
           <textarea 
@@ -138,7 +138,7 @@ export const AssignmentHelper: React.FC<AssignmentHelperProps> = ({ progress, on
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="e.g. Derive the Euler's equation of motion..."
             rows={5}
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-base"
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 dark:backdrop-blur-md text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-base"
           />
           <div className="flex justify-end">
             <button 
@@ -154,7 +154,7 @@ export const AssignmentHelper: React.FC<AssignmentHelperProps> = ({ progress, on
       </div>
 
       {solution && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden animate-fadeIn">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fadeIn">
           <div className="bg-indigo-50 dark:bg-indigo-900/20 px-5 py-4 border-b border-indigo-100 dark:border-indigo-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -166,7 +166,7 @@ export const AssignmentHelper: React.FC<AssignmentHelperProps> = ({ progress, on
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
                 isCompleted 
                   ? 'bg-emerald-100 text-emerald-700 cursor-default' 
-                  : 'bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
+                  : 'bg-white dark:bg-white/5 dark:backdrop-blur-md border-2 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 shadow-sm'
               }`}
             >
               <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'text-emerald-600' : ''}`} />

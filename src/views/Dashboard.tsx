@@ -360,7 +360,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-700">
+                <tr className="border-b border-slate-100 dark:border-white/10">
                   <th className="pb-3 font-semibold text-slate-600 dark:text-slate-400">User</th>
                   <th className="pb-3 font-semibold text-slate-600 dark:text-slate-400">Major</th>
                   <th className="pb-3 font-semibold text-slate-600 dark:text-slate-400">Time</th>
