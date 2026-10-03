@@ -108,35 +108,35 @@ export const Calculator: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 pb-20 text-slate-200">
+    <div className="space-y-8 pb-20 text-slate-900 dark:text-slate-200">
       <header className="space-y-2">
-        <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
           <CalcIcon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-400 shrink-0" />
           Grade Calculator
         </h2>
-        <p className="text-sm sm:text-base text-slate-400">Calculate your SGPA, CGPA, and convert marks to grades based on the 2021 Regulation (10-point scale).</p>
+        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Calculate your SGPA, CGPA, and convert marks to grades based on the 2021 Regulation (10-point scale).</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Marks to Grade Converter */}
-        <div className="bg-[#111111] border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-indigo-500/20 rounded-lg shrink-0">
               <BookOpen className="w-5 h-5 text-indigo-400" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">Marks to Grade</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Marks to Grade</h3>
           </div>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-slate-400 mb-2">Enter Marks (0-100)</label>
+              <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Enter Marks (0-100)</label>
               <input 
                 type="number" 
                 min="0" 
                 max="100"
                 value={marks}
                 onChange={(e) => setMarks(e.target.value)}
-                className="w-full bg-[#1a1a1a] border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-base min-h-[44px]"
+                className="w-full bg-slate-50 dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-base min-h-[44px]"
                 placeholder="e.g. 85"
               />
             </div>
@@ -157,17 +157,17 @@ export const Calculator: React.FC = () => {
         </div>
 
         {/* CGPA to Percentage Converter */}
-        <div className="bg-[#111111] border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
+        <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-emerald-500/20 rounded-lg shrink-0">
               <Percent className="w-5 h-5 text-emerald-400" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">CGPA to Percentage</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">CGPA to Percentage</h3>
           </div>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-slate-400 mb-2">Enter CGPA</label>
+              <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Enter CGPA</label>
               <input 
                 type="number" 
                 step="0.01"
@@ -175,7 +175,7 @@ export const Calculator: React.FC = () => {
                 max="10"
                 value={cgpaInput}
                 onChange={(e) => setCgpaInput(e.target.value)}
-                className="w-full bg-[#1a1a1a] border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-base min-h-[44px]"
+                className="w-full bg-slate-50 dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-base min-h-[44px]"
                 placeholder="e.g. 8.5"
               />
             </div>
@@ -195,13 +195,13 @@ export const Calculator: React.FC = () => {
       </div>
 
       {/* SGPA Calculator */}
-      <div className="bg-[#111111] border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
+      <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/20 rounded-lg shrink-0">
               <CalcIcon className="w-5 h-5 text-blue-400" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">SGPA Calculator</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">SGPA Calculator</h3>
           </div>
           <button 
             onClick={addSubject}
@@ -227,7 +227,7 @@ export const Calculator: React.FC = () => {
                   value={subject.name}
                   onChange={(e) => updateSubject(subject.id, 'name', e.target.value)}
                   placeholder={`Subject ${index + 1}`}
-                  className="w-full bg-transparent border-none text-white focus:ring-0 outline-none px-2 text-sm font-bold"
+                  className="w-full bg-transparent border-none text-slate-900 dark:text-white focus:ring-0 outline-none px-2 text-sm font-bold"
                 />
               </div>
               <div className="col-span-1 sm:col-span-3 flex items-center gap-3 sm:block">
@@ -238,7 +238,7 @@ export const Calculator: React.FC = () => {
                   max="10"
                   value={subject.credits}
                   onChange={(e) => updateSubject(subject.id, 'credits', parseInt(e.target.value) || 0)}
-                  className="w-full bg-[#222] border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm min-h-[40px]"
+                  className="w-full bg-white dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm min-h-[40px]"
                 />
               </div>
               <div className="col-span-1 sm:col-span-3 flex items-center gap-3 sm:block">
@@ -246,7 +246,7 @@ export const Calculator: React.FC = () => {
                 <select 
                   value={subject.grade}
                   onChange={(e) => updateSubject(subject.id, 'grade', e.target.value)}
-                  className="w-full bg-[#222] border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none text-sm min-h-[40px]"
+                  className="w-full bg-white dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none text-sm min-h-[40px]"
                 >
                   {GRADES.map(g => (
                     <option key={g.grade} value={g.grade}>{g.grade} ({g.point} pts)</option>
@@ -257,7 +257,7 @@ export const Calculator: React.FC = () => {
                 <button 
                   onClick={() => removeSubject(subject.id)}
                   disabled={subjects.length === 1}
-                  className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-30 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                  className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-30 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -266,7 +266,7 @@ export const Calculator: React.FC = () => {
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-800">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 dark:border-white/10">
           <button 
             onClick={calculateSGPA}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg shadow-blue-500/20 min-h-[44px]"
@@ -284,13 +284,13 @@ export const Calculator: React.FC = () => {
       </div>
 
       {/* CGPA Calculator */}
-      <div className="bg-[#111111] border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
+      <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl animate-fadeIn">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-500/20 rounded-lg shrink-0">
               <GraduationCap className="w-5 h-5 text-purple-400" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">CGPA Calculator</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">CGPA Calculator</h3>
           </div>
           <button 
             onClick={addSemester}
@@ -324,7 +324,7 @@ export const Calculator: React.FC = () => {
                   value={sem.sgpa}
                   onChange={(e) => updateSemester(sem.id, 'sgpa', e.target.value)}
                   placeholder="e.g. 8.5"
-                  className="w-full bg-[#222] border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 outline-none text-sm min-h-[40px]"
+                  className="w-full bg-white dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none text-sm min-h-[40px]"
                 />
               </div>
               <div className="col-span-1 sm:col-span-4 flex items-center gap-3 sm:block">
@@ -335,14 +335,14 @@ export const Calculator: React.FC = () => {
                   value={sem.credits}
                   onChange={(e) => updateSemester(sem.id, 'credits', e.target.value)}
                   placeholder="e.g. 22"
-                  className="w-full bg-[#222] border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-purple-500 outline-none text-sm min-h-[40px]"
+                  className="w-full bg-white dark:bg-black/20 dark:backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none text-sm min-h-[40px]"
                 />
               </div>
               <div className="col-span-1 flex justify-end sm:justify-center mt-2 sm:mt-0">
                 <button 
                   onClick={() => removeSemester(sem.id)}
                   disabled={semesters.length === 1}
-                  className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-30 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                  className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-30 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -351,7 +351,7 @@ export const Calculator: React.FC = () => {
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-800">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 dark:border-white/10">
           <button 
             onClick={calculateCGPA}
             className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg shadow-purple-500/20 min-h-[44px]"

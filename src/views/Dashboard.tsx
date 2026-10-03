@@ -15,8 +15,64 @@ import {
   CheckCircle,
   Brain,
   History,
-  ShieldCheck
+  ShieldCheck,
+  Rocket,
+  Wand2,
+  Compass,
+  Layers,
+  Activity
 } from 'lucide-react';
+
+
+const FeatureCard = ({ 
+  title, 
+  description, 
+  icon: Icon, 
+  lightIconBg, 
+  lightIconText,
+  darkIconGradient, 
+  glowColor, 
+  hoverBorder,
+  onClick 
+}: any) => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      className={"relative p-6 sm:p-8 bg-white dark:bg-white/5 dark:backdrop-blur-xl border border-transparent dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-xl rounded-[2rem] transition-all duration-500 cursor-pointer overflow-hidden group hover:-translate-y-2 hover:shadow-2xl " + hoverBorder}
+    >
+      {/* Mouse flow glow - visible only in dark mode on hover */}
+      <div 
+        className="hidden dark:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"
+        style={{
+          background: "radial-gradient(400px circle at " + mousePos.x + "px " + mousePos.y + "px, " + glowColor + ", transparent 40%)"
+        }}
+      />
+      
+      {/* Icon Container */}
+      <div className={"relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg " + lightIconBg + " dark:bg-transparent dark:bg-gradient-to-br " + darkIconGradient}>
+        <Icon className={"w-8 h-8 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)] " + lightIconText + " dark:text-white"} />
+      </div>
+      
+      <h3 className="relative z-10 text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2 transition-colors">
+        {title}
+      </h3>
+      <p className="relative z-10 text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
+        {description}
+      </p>
+    </div>
+  );
+};
 
 interface DashboardProps {
   user: User;
@@ -119,8 +175,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
     <div className="space-y-8 pb-12">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome, {user.name}!</h2>
-          <p className="text-slate-600 dark:text-slate-400">Pursuing {user.major} • {totalCompleted} Milestones Achieved</p>
+          <h2 
+            className="text-5xl md:text-7xl font-normal tracking-wider anime-gradient-text mb-2"
+            style={{ fontFamily: "'Bangers', cursive", letterSpacing: '0.05em' }}
+          >
+            Welcome, {user.name}!
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400 font-medium">Pursuing <span className="font-bold text-blue-600 dark:text-[#C4F135]">{user.major}</span> • <span className="font-bold text-indigo-600 dark:text-cyan-400">{totalCompleted} Milestones Achieved</span></p>
         </div>
         <button 
           onClick={onLogout}
@@ -176,60 +237,61 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-        <div 
+        <FeatureCard 
+          title="Smart Planner" 
+          description="Generate optimized AI study schedules effortlessly."
+          icon={Rocket}
+          lightIconBg="bg-blue-100"
+          lightIconText="text-blue-600"
+          darkIconGradient="dark:from-blue-600/40 dark:to-cyan-600/40 dark:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+          glowColor="rgba(59, 130, 246, 0.15)"
+          hoverBorder="dark:hover:border-blue-500/50"
           onClick={() => onViewChange('planner')}
-          className="p-5 sm:p-6 bg-white dark:bg-white/10 dark:backdrop-blur-md dark:border-white/20 border border-transparent dark:hover:bg-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] hover:border-[#C4F135] dark:hover:border-blue-500 rounded-3xl transition-all cursor-pointer group"
-        >
-          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Zap className="text-blue-600 dark:text-blue-400 w-6 h-6" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Smart Planner</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Generate optimized study schedules.</p>
-        </div>
-
-        <div 
+        />
+        <FeatureCard 
+          title="Quick Notes" 
+          description="Magically convert topics into structured notes."
+          icon={Wand2}
+          lightIconBg="bg-indigo-100"
+          lightIconText="text-indigo-600"
+          darkIconGradient="dark:from-indigo-600/40 dark:to-purple-600/40 dark:shadow-[0_0_20px_rgba(99,102,241,0.3)]"
+          glowColor="rgba(99, 102, 241, 0.15)"
+          hoverBorder="dark:hover:border-indigo-500/50"
           onClick={() => onViewChange('notes')}
-          className="p-5 sm:p-6 bg-white dark:bg-white/10 dark:backdrop-blur-md dark:border-white/20 border border-transparent dark:hover:bg-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] hover:border-[#C4F135] dark:hover:border-indigo-500 rounded-3xl transition-all cursor-pointer group"
-        >
-          <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Book className="text-indigo-600 dark:text-indigo-400 w-6 h-6" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Quick Notes</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Convert topics into structured notes.</p>
-        </div>
-
-        <div 
+        />
+        <FeatureCard 
+          title="Skill Up" 
+          description="Navigate your career with step-by-step roadmaps."
+          icon={Compass}
+          lightIconBg="bg-emerald-100"
+          lightIconText="text-emerald-600"
+          darkIconGradient="dark:from-emerald-600/40 dark:to-teal-600/40 dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+          glowColor="rgba(16, 185, 129, 0.15)"
+          hoverBorder="dark:hover:border-emerald-500/50"
           onClick={() => onViewChange('roadmap')}
-          className="p-5 sm:p-6 bg-white dark:bg-white/10 dark:backdrop-blur-md dark:border-white/20 border border-transparent dark:hover:bg-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] hover:border-[#C4F135] dark:hover:border-emerald-500 rounded-3xl transition-all cursor-pointer group"
-        >
-          <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Target className="text-emerald-600 dark:text-emerald-400 w-6 h-6" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Skill Up</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Step-by-step career roadmaps.</p>
-        </div>
-
-        <div 
+        />
+        <FeatureCard 
+          title="Revision Cards" 
+          description="Master completed topics with dynamic flashcards."
+          icon={Layers}
+          lightIconBg="bg-orange-100"
+          lightIconText="text-orange-600"
+          darkIconGradient="dark:from-orange-600/40 dark:to-rose-600/40 dark:shadow-[0_0_20px_rgba(249,115,22,0.3)]"
+          glowColor="rgba(249, 115, 22, 0.15)"
+          hoverBorder="dark:hover:border-orange-500/50"
           onClick={() => onViewChange('flashcards')}
-          className="p-5 sm:p-6 bg-white dark:bg-white/10 dark:backdrop-blur-md dark:border-white/20 border border-transparent dark:hover:bg-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] hover:border-[#C4F135] dark:hover:border-orange-500 rounded-3xl transition-all cursor-pointer group"
-        >
-          <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Brain className="text-orange-600 dark:text-orange-400 w-6 h-6" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Revision Cards</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Quick flashcards for completed topics.</p>
-        </div>
-
-        <div 
+        />
+        <FeatureCard 
+          title="Report Card" 
+          description="Analyze detailed academic performance & stats."
+          icon={Activity}
+          lightIconBg="bg-blue-100"
+          lightIconText="text-blue-600"
+          darkIconGradient="dark:from-blue-600/40 dark:to-indigo-600/40 dark:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+          glowColor="rgba(59, 130, 246, 0.15)"
+          hoverBorder="dark:hover:border-blue-500/50"
           onClick={() => onViewChange('reportcard')}
-          className="p-5 sm:p-6 bg-white dark:bg-white/10 dark:backdrop-blur-md dark:border-white/20 border border-transparent dark:hover:bg-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] hover:border-[#C4F135] dark:hover:border-blue-500 rounded-3xl transition-all cursor-pointer group"
-        >
-          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <BarChart3 className="text-blue-600 dark:text-blue-400 w-6 h-6" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Report Card</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Detailed academic performance & stats.</p>
-        </div>
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
