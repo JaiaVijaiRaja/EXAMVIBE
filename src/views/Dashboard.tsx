@@ -181,7 +181,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
           >
             Welcome, {user.name}!
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 font-medium">Pursuing <span className="font-bold text-blue-600 dark:text-[#C4F135]">{user.major}</span> • <span className="font-bold text-indigo-600 dark:text-cyan-400">{totalCompleted} Milestones Achieved</span></p>
+          <p className="text-slate-600 dark:text-slate-400 font-medium mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
+            <span>Pursuing</span>
+            <span className="font-bold text-blue-600 dark:text-white dark:bg-white/5 dark:px-3 dark:py-1 dark:rounded-full dark:border dark:border-white/10 dark:shadow-sm transition-all">
+              {user.major}
+            </span> 
+            <span className="opacity-50 dark:opacity-30">•</span> 
+            <span className="font-bold text-indigo-600 dark:text-slate-200 dark:bg-white/5 dark:px-3 dark:py-1 dark:rounded-full dark:border dark:border-white/10 dark:shadow-sm transition-all">
+              {totalCompleted} Milestones Achieved
+            </span>
+          </p>
         </div>
         <button 
           onClick={onLogout}

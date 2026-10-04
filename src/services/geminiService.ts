@@ -3,10 +3,20 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
+const parseJSON = (text: string) => {
+  try {
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    return JSON.parse(cleaned || '[]');
+  } catch (e) {
+    console.error("Failed to parse JSON response:", text);
+    return [];
+  }
+};
+
 export const geminiService = {
   async generateStudyPlan(subjects: string[], examDate: string) {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: `Generate a daily study plan for these subjects: ${subjects.join(', ')}. The final exam is on ${examDate}. Focus on engineering student needs. Output in JSON format.`,
       config: {
         responseMimeType: 'application/json',
@@ -23,7 +33,7 @@ export const geminiService = {
         }
       }
     });
-    return JSON.parse(response.text || '[]');
+    return parseJSON(response.text || '[]');
   },
 
   async generateNotes(topic: string, type: 'short' | 'detailed' | 'exam-ready') {
@@ -41,7 +51,7 @@ Ensure the notes strictly follow this structure:
 
 Generate the ${type} version of these notes.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
     });
     return response.text || '';
@@ -50,7 +60,7 @@ Generate the ${type} version of these notes.`;
   async solveAssignment(question: string) {
     const prompt = `Solve this assignment question with a structured, professional engineering response: "${question}". Include Introduction, Step-by-Step explanation, and Conclusion. Use Markdown.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
     });
     return response.text || '';
@@ -59,16 +69,18 @@ Generate the ${type} version of these notes.`;
   async predictQuestions(subject: string, syllabus: string) {
     const prompt = `Based on the following syllabus for ${subject}, predict 10 important questions likely to appear in the exam. Provide brief reasons for each prediction. Syllabus: ${syllabus}`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
     });
     return response.text || '';
   },
 
   async generateRoadmap(skill: string, level: string, goal: string) {
-    const prompt = `Create a 4-week step-by-step roadmap to learn ${skill} starting from ${level} level to achieve: ${goal}. Include resources and a mini project for each week. Output in JSON.`;
+    const prompt = `Create a 4-week step-by-step roadmap STRICTLY to learn the specific skill/topic "${skill}" starting from ${level} level to achieve: "${goal}". 
+CRITICAL INSTRUCTION: Do NOT provide a generic Computer Science roadmap. Every week's topic, description, and project must be heavily focused on "${skill}" ONLY. 
+For resources, provide specific items formatted exactly as markdown links: "[Resource Name](https://actual-link.com)". Output in JSON.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -88,13 +100,13 @@ Generate the ${type} version of these notes.`;
         }
       }
     });
-    return JSON.parse(response.text || '[]');
+    return parseJSON(response.text || '[]');
   },
 
   async generateChallenge(skill: string) {
     const prompt = `Generate a 7-day micro-learning challenge for ${skill}. Each day should have a specific goal, an action item, and a suggested material. Output in JSON.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -113,13 +125,13 @@ Generate the ${type} version of these notes.`;
         }
       }
     });
-    return JSON.parse(response.text || '[]');
+    return parseJSON(response.text || '[]');
   },
 
   async generateFlashcards(topics: string[]) {
     const prompt = `Generate 10 revision flashcards for the following engineering topics: ${topics.join(', ')}. Each flashcard should have a 'question' and an 'answer'. Output in JSON format.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -136,13 +148,13 @@ Generate the ${type} version of these notes.`;
         }
       }
     });
-    return JSON.parse(response.text || '[]');
+    return parseJSON(response.text || '[]');
   },
 
   async generateQuiz(topic: string, content: string) {
     const prompt = `Generate a 5-question multiple-choice quiz based on the following topic: "${topic}" and content: "${content.substring(0, 2000)}". Each question should have 4 options and one correct answer. Output in JSON format.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.8-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -160,6 +172,6 @@ Generate the ${type} version of these notes.`;
         }
       }
     });
-    return JSON.parse(response.text || '[]');
+    return parseJSON(response.text || '[]');
   }
 };

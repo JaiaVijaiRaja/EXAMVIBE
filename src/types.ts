@@ -58,6 +58,13 @@ export interface AppProgress {
     goal: string;
     items: RoadmapItem[];
   };
+  savedRoadmaps?: Array<{
+    id?: string;
+    skill: string;
+    level: string;
+    goal: string;
+    items: RoadmapItem[];
+  }>;
   savedPlanner?: {
     subjects: string;
     examDate: string;

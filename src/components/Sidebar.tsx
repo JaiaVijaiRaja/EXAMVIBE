@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, pro
         <h1 className="text-2xl font-black text-white dark:text-white tracking-tighter">
           EXAMVIBE
         </h1>
-        <p className="text-[10px] font-bold text-[#C4F135] dark:text-slate-400 uppercase tracking-[0.2em] mt-1">
+        <p className="text-[10px] font-bold text-[#C4F135] dark:text-[#8B5CF6] uppercase tracking-[0.2em] mt-1">
           Study Smarter
         </p>
       </div>
@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, pro
                 className={`
                   w-full flex items-center gap-4 px-4 py-3.5 text-sm font-bold rounded-2xl transition-all duration-300 min-h-[52px] group relative
                   ${isActive 
-                    ? 'bg-[#C4F135] text-[#1E1E2D] shadow-lg shadow-[#C4F135]/20 scale-[1.02] dark:bg-white/20 dark:text-white dark:shadow-[0_4px_12px_rgba(255,255,255,0.05)]' 
+                    ? 'bg-[#C4F135] text-[#1E1E2D] shadow-lg shadow-[#C4F135]/20 scale-[1.02] dark:bg-[#8B5CF6] dark:text-white dark:shadow-[#8B5CF6]/25' 
                     : 'text-white/60 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white'}
                 `}
               >

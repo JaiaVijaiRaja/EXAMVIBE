@@ -37,36 +37,39 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
   const sgpa = progress.sgpa || 0;
 
   const getPerformanceData = () => {
-    if (cgpa === 0) {
-      return { name: "Just Started", badge: "—" };
-    }
+    // Calculate XP (Solo Leveling Style) based on user activities
+    const totalXP = 
+      (taskCount * 10) + 
+      (roadmapCount * 50) + 
+      (challengeCount * 20) + 
+      (notesCount * 5) + 
+      (examPassedCount * 100) + 
+      (questionsStudied * 2) + 
+      (streaks * 15);
 
     const levels = [
-      { name: "Needs Focus", badge: "D" },      // CGPA < 6.0
-      { name: "Steady Climber", badge: "C" },   // CGPA >= 6.0
-      { name: "Rising Star", badge: "B" },      // CGPA >= 7.0
-      { name: "High Achiever", badge: "A" },    // CGPA >= 8.0
-      { name: "Elite", badge: "A+" },           // CGPA >= 8.5
-      { name: "Legend", badge: "S" },           // CGPA >= 9.0
+      { name: "F-Rank", badge: "F", borderColor: "border-slate-400", textColor: "text-slate-300 dark:text-slate-600" },
+      { name: "E-Rank", badge: "E", borderColor: "border-emerald-500", textColor: "text-emerald-400 dark:text-emerald-600" },
+      { name: "D-Rank", badge: "D", borderColor: "border-blue-500", textColor: "text-blue-400 dark:text-blue-600" },
+      { name: "C-Rank", badge: "C", borderColor: "border-indigo-500", textColor: "text-indigo-400 dark:text-indigo-600" },
+      { name: "B-Rank", badge: "B", borderColor: "border-purple-500", textColor: "text-purple-400 dark:text-purple-600" },
+      { name: "A-Rank", badge: "A", borderColor: "border-rose-500", textColor: "text-rose-400 dark:text-rose-600" },
+      { name: "S-Rank", badge: "S", borderColor: "border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]", textColor: "text-amber-400 dark:text-amber-600" },
     ];
 
     let levelIndex = 0;
-    if (cgpa >= 9.0) levelIndex = 5;
-    else if (cgpa >= 8.5) levelIndex = 4;
-    else if (cgpa >= 8.0) levelIndex = 3;
-    else if (cgpa >= 7.0) levelIndex = 2;
-    else if (cgpa >= 6.0) levelIndex = 1;
+    if (totalXP >= 4000) levelIndex = 6;
+    else if (totalXP >= 2000) levelIndex = 5;
+    else if (totalXP >= 1000) levelIndex = 4;
+    else if (totalXP >= 600) levelIndex = 3;
+    else if (totalXP >= 300) levelIndex = 2;
+    else if (totalXP >= 100) levelIndex = 1;
     else levelIndex = 0;
 
-    // Boost logic: If streak ≥ 7 days AND CGPA >= 8.0, boost one level up
-    if (streaks >= 7 && cgpa >= 8.0 && levelIndex < levels.length - 1) {
-      levelIndex += 1;
-    }
-
-    return levels[levelIndex];
+    return { ...levels[levelIndex], xp: totalXP };
   };
 
-  const { name: performanceLevel, badge: performanceBadge } = getPerformanceData();
+  const { name: performanceLevel, badge: performanceBadge, borderColor, textColor, xp } = getPerformanceData();
 
   const stats = [
     { label: 'Exams Passed', value: examPassedCount, icon: GraduationCap, color: 'text-emerald-400', bg: 'bg-emerald-400/10', desc: 'Total exams successfully cleared' },
@@ -152,11 +155,12 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
           className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-5 sm:p-6 rounded-3xl flex items-center gap-5 sm:gap-6 shadow-2xl border border-white/10 dark:border-slate-900/10"
         >
           <div className="text-right">
-            <div className="text-[10px] font-black uppercase tracking-widest opacity-60">Performance Level</div>
-            <div className="text-xl sm:text-2xl font-black uppercase tracking-tighter leading-tight">{performanceLevel}</div>
+            <div className="text-[10px] font-black uppercase tracking-widest opacity-60">Hunter Rank</div>
+            <div className={`text-xl sm:text-2xl font-black uppercase tracking-tighter leading-tight ${textColor}`}>{performanceLevel}</div>
+            <div className="text-[10px] font-bold text-slate-400 mt-0.5 tracking-widest">{xp} XP Earned</div>
           </div>
           <div className="h-12 w-[1px] bg-white/20 dark:bg-slate-900/20" />
-          <div className="flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-full border-4 border-blue-500 text-2xl sm:text-3xl font-black shrink-0">
+          <div className={`flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-full border-4 ${borderColor} ${textColor} text-2xl sm:text-3xl font-black shrink-0`}>
             {performanceBadge}
           </div>
         </motion.div>

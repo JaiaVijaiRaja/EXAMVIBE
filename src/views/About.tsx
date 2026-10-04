@@ -163,17 +163,20 @@ export const About: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden text-center"
+        className="rounded-[2rem] sm:rounded-[2.5rem] bg-slate-900 dark:bg-slate-900/80 border border-slate-800 dark:border-white/10 p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden text-center"
       >
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20" />
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/30 blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-purple-500/30 blur-3xl pointer-events-none" />
+        
         <div className="relative z-10 space-y-4 sm:space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter">Let's Build the Future</h2>
-          <p className="text-sm sm:text-base text-blue-100 font-medium max-w-xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-white">Let's Build the Future</h2>
+          <p className="text-sm sm:text-base text-slate-300 font-medium max-w-xl mx-auto">
             Have questions, feedback, or collaboration ideas? I'm always open to discussing new projects and opportunities.
           </p>
           <a 
             href="mailto:vijaithegamer@gmail.com"
-            className="inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-white text-blue-600 font-black uppercase tracking-widest text-xs sm:text-sm hover:bg-blue-50 transition-colors shadow-xl min-h-[48px]"
+            className="inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs sm:text-sm hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] min-h-[48px] border border-blue-500/50"
           >
             <Mail className="w-5 h-5" />
             Get In Touch
