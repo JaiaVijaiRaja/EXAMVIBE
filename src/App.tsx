@@ -336,7 +336,7 @@ const App: React.FC = () => {
       case 'flashcards':
         return <Flashcards progress={progress} onUpdateProgress={updateProgress} showToast={showToast} />;
       case 'calculator':
-        return <Calculator />;
+        return <Calculator progress={progress} onUpdateProgress={updateProgress} showToast={showToast} />;
       case 'reportcard':
         return <ReportCardView progress={progress} onUpdateProgress={updateProgress} showToast={showToast} />;
       case 'about':

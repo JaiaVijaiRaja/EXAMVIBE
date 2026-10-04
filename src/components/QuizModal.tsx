@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { geminiService } from '../services/geminiService';
 import { QuizQuestion } from '../types';
 import { Loader2, X, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
@@ -10,6 +10,15 @@ interface QuizModalProps {
   onComplete: () => void;
   onClose: () => void;
 }
+
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
 
 export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete, onClose }) => {
   const [loading, setLoading] = useState(true);
@@ -25,13 +34,21 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
       try {
         const result = await geminiService.generateQuiz(topic, content);
         if (result && result.length > 0) {
-          setQuestions(result);
+          const shuffledResult = result.map((q: QuizQuestion) => ({
+            ...q,
+            options: shuffleArray(q.options)
+          }));
+          setQuestions(shuffledResult);
         } else {
           setError("Failed to generate quiz questions. Please try again.");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        setError("An error occurred while generating the quiz.");
+        if (err?.status === 429 || err?.message?.includes('429') || err?.message?.includes('quota')) {
+          setError("You have reached your daily AI limit for free usage. Please try again tomorrow.");
+        } else {
+          setError("An error occurred while generating the quiz. Please try again later.");
+        }
       } finally {
         setLoading(false);
       }
@@ -57,7 +74,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
   };
 
   const handleFinish = () => {
-    const passingScore = Math.ceil(questions.length * 0.6); // 60% to pass
+    const passingScore = Math.ceil(questions.length * 0.75); // 75% to pass
     if (score >= passingScore) {
       onComplete();
     } else {
@@ -65,8 +82,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-700 shrink-0">
           <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base truncate pr-4">Topic Quiz: {topic}</h3>
@@ -90,7 +107,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
           ) : showResult ? (
             <div className="py-4 sm:py-8 text-center space-y-6">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto">
-                {score >= Math.ceil(questions.length * 0.6) ? (
+                {score >= Math.ceil(questions.length * 0.75) ? (
                   <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-500" />
                 ) : (
                   <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-amber-500" />
@@ -103,7 +120,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
                 </p>
               </div>
               
-              {score >= Math.ceil(questions.length * 0.6) ? (
+              {score >= Math.ceil(questions.length * 0.75) ? (
                 <div className="p-3 sm:p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 rounded-xl">
                   <p className="text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-medium">
                     Great job! You've passed the quiz and this topic is now marked as completed.
@@ -112,7 +129,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
               ) : (
                 <div className="p-3 sm:p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800 rounded-xl">
                   <p className="text-amber-700 dark:text-amber-400 text-xs sm:text-sm font-medium">
-                    You need at least 60% to pass. Review the material and try again later.
+                    You need at least 75% to pass. Review the material and try again later.
                   </p>
                 </div>
               )}
@@ -121,7 +138,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
                 onClick={handleFinish}
                 className="w-full py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all min-h-[48px]"
               >
-                {score >= Math.ceil(questions.length * 0.6) ? 'Finish & Mark Completed' : 'Close'}
+                {score >= Math.ceil(questions.length * 0.75) ? 'Finish & Mark Completed' : 'Close'}
               </button>
             </div>
           ) : (
@@ -180,6 +197,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ topic, content, onComplete
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

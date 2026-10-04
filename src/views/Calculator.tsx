@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Calculator as CalcIcon, Plus, Trash2, GraduationCap, Percent, BookOpen } from 'lucide-react';
+import { AppProgress } from '../types';
 
 const GRADES = [
   { grade: 'O', point: 10, min: 91, max: 100, label: 'Outstanding' },
@@ -16,7 +17,13 @@ const getGradeFromMarks = (marks: number) => {
   return GRADES.find(g => marks >= g.min && marks <= g.max) || GRADES[GRADES.length - 1];
 };
 
-export const Calculator: React.FC = () => {
+interface CalculatorProps {
+  progress?: AppProgress;
+  onUpdateProgress?: (newProgress: Partial<AppProgress>) => void;
+  showToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+export const Calculator: React.FC<CalculatorProps> = ({ progress, onUpdateProgress, showToast }) => {
   // Marks to Grade State
   const [marks, setMarks] = useState<string>('');
   
@@ -101,7 +108,12 @@ export const Calculator: React.FC = () => {
     });
 
     if (totalCredits > 0) {
-      setCgpaResult(Number((totalPoints / totalCredits).toFixed(2)));
+      const finalCgpa = Number((totalPoints / totalCredits).toFixed(2));
+      setCgpaResult(finalCgpa);
+      if (onUpdateProgress && showToast) {
+        onUpdateProgress({ cgpa: finalCgpa });
+        showToast('CGPA calculated and saved to your progress!', 'success');
+      }
     } else {
       setCgpaResult(0);
     }

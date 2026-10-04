@@ -335,7 +335,7 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
 
       {activeQuiz && (
         <QuizModal 
-          topic={`Week ${activeQuiz.week}: ${activeQuiz.topic}`} 
+          topic={`${activeQuiz.skillKey} - Week ${activeQuiz.week}: ${activeQuiz.topic}`} 
           content={activeQuiz.content} 
           onComplete={handleQuizComplete} 
           onClose={() => setActiveQuiz(null)} 

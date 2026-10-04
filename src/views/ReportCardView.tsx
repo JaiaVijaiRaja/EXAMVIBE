@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { 
   Trophy, 
@@ -75,7 +75,6 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
     { label: 'Exams Passed', value: examPassedCount, icon: GraduationCap, color: 'text-emerald-400', bg: 'bg-emerald-400/10', desc: 'Total exams successfully cleared' },
     { label: 'Current Streak', value: `${streaks}d`, icon: Flame, color: 'text-orange-400', bg: 'bg-orange-400/10', desc: 'Consecutive study days' },
     { label: 'Cumulative GPA', value: cgpa.toFixed(2), icon: Award, color: 'text-purple-400', bg: 'bg-purple-400/10', desc: 'Overall academic standing' },
-    { label: 'Semester GPA', value: sgpa.toFixed(2), icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-400/10', desc: 'Current term performance' },
     { label: 'Tasks Completed', value: taskCount, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400/10', desc: 'Daily study goals achieved' },
     { label: 'Smart Notes', value: notesCount, icon: BookOpen, color: 'text-indigo-400', bg: 'bg-indigo-400/10', desc: 'Topics mastered with AI' },
     { label: 'Roadmap Progress', value: roadmapCount, icon: Target, color: 'text-emerald-400', bg: 'bg-emerald-400/10', desc: 'Skill milestones reached' },
@@ -99,8 +98,8 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
 
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-8 sm:space-y-12">
-      {editingStat && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+      {editingStat && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
           <div className="bg-white dark:bg-white/5 dark:backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-white/10 animate-fadeIn">
             <h3 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">Update {editingStat.label}</h3>
             <input 
@@ -108,6 +107,7 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
               step="any"
               value={editingStat.value}
               onChange={(e) => setEditingStat({ ...editingStat, value: e.target.value })}
+              placeholder={editingStat.key === 'cgpa' ? 'e.g. 8.5' : ''}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white mb-6 focus:ring-2 focus:ring-blue-500 outline-none text-lg min-h-[48px]"
               autoFocus
             />
@@ -126,7 +126,8 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-2">
@@ -215,21 +216,13 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
             Update Records
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex justify-center">
             <button 
-              onClick={() => setEditingStat({ key: 'cgpa', label: 'CGPA', value: cgpa.toString() })}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 p-5 sm:p-6 rounded-2xl transition-all group text-left min-h-[80px]"
+              onClick={() => setEditingStat({ key: 'cgpa', label: 'CGPA', value: cgpa === 0 ? '' : cgpa.toString() })}
+              className="bg-white/10 hover:bg-white/20 border border-white/20 p-5 sm:p-6 rounded-2xl transition-all group text-center min-h-[80px] w-full max-w-xs"
             >
-              <div className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Update</div>
+              <div className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Update</div>
               <div className="text-xl font-black tracking-tighter">CGPA</div>
-            </button>
-            
-            <button 
-              onClick={() => setEditingStat({ key: 'sgpa', label: 'SGPA', value: sgpa.toString() })}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 p-5 sm:p-6 rounded-2xl transition-all group text-left min-h-[80px]"
-            >
-              <div className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Update</div>
-              <div className="text-xl font-black tracking-tighter">SGPA</div>
             </button>
           </div>
         </div>

@@ -13,10 +13,42 @@ const parseJSON = (text: string) => {
   }
 };
 
+const withRetry = async <T>(fn: (model: string) => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
+  const models = ['gemini-3.5-flash', 'gemini-3.8-flash'];
+  let lastError: any = null;
+
+  for (const model of models) {
+    let currentRetries = retries;
+    let currentDelay = delay;
+    
+    while (currentRetries >= 0) {
+      try {
+        return await fn(model);
+      } catch (error: any) {
+        lastError = error;
+        // Don't retry on 400 (Bad Request / Safety) or 404 (Not Found)
+        if (error.status === 400 || error.status === 404) {
+          throw error;
+        }
+        
+        if (currentRetries === 0) break;
+        
+        console.warn(`[${model}] API call failed, retrying in ${currentDelay}ms... (${currentRetries} retries left)`, error.message);
+        await new Promise(res => setTimeout(res, currentDelay));
+        currentRetries--;
+        currentDelay *= 2;
+      }
+    }
+    console.warn(`Model ${model} exhausted retries or hit quota. Switching to next model...`);
+  }
+  
+  throw lastError;
+};
+
 export const geminiService = {
   async generateStudyPlan(subjects: string[], examDate: string) {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: `Generate a daily study plan for these subjects: ${subjects.join(', ')}. The final exam is on ${examDate}. Focus on engineering student needs. Output in JSON format.`,
       config: {
         responseMimeType: 'application/json',
@@ -32,7 +64,7 @@ export const geminiService = {
           }
         }
       }
-    });
+    }));
     return parseJSON(response.text || '[]');
   },
 
@@ -50,28 +82,28 @@ Ensure the notes strictly follow this structure:
 ## 6. Quick Revision Points
 
 Generate the ${type} version of these notes.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
-    });
+    }));
     return response.text || '';
   },
 
   async solveAssignment(question: string) {
     const prompt = `Solve this assignment question with a structured, professional engineering response: "${question}". Include Introduction, Step-by-Step explanation, and Conclusion. Use Markdown.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
-    });
+    }));
     return response.text || '';
   },
 
   async predictQuestions(subject: string, syllabus: string) {
     const prompt = `Based on the following syllabus for ${subject}, predict 10 important questions likely to appear in the exam. Provide brief reasons for each prediction. Syllabus: ${syllabus}`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
-    });
+    }));
     return response.text || '';
   },
 
@@ -79,8 +111,8 @@ Generate the ${type} version of these notes.`;
     const prompt = `Create a 4-week step-by-step roadmap STRICTLY to learn the specific skill/topic "${skill}" starting from ${level} level to achieve: "${goal}". 
 CRITICAL INSTRUCTION: Do NOT provide a generic Computer Science roadmap. Every week's topic, description, and project must be heavily focused on "${skill}" ONLY. 
 For resources, provide specific items formatted exactly as markdown links: "[Resource Name](https://actual-link.com)". Output in JSON.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -99,14 +131,14 @@ For resources, provide specific items formatted exactly as markdown links: "[Res
           }
         }
       }
-    });
+    }));
     return parseJSON(response.text || '[]');
   },
 
   async generateChallenge(skill: string) {
     const prompt = `Generate a 7-day micro-learning challenge for ${skill}. Each day should have a specific goal, an action item, and a suggested material. Output in JSON.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -124,14 +156,14 @@ For resources, provide specific items formatted exactly as markdown links: "[Res
           }
         }
       }
-    });
+    }));
     return parseJSON(response.text || '[]');
   },
 
   async generateFlashcards(topics: string[]) {
     const prompt = `Generate 10 revision flashcards for the following engineering topics: ${topics.join(', ')}. Each flashcard should have a 'question' and an 'answer'. Output in JSON format.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -147,14 +179,19 @@ For resources, provide specific items formatted exactly as markdown links: "[Res
           }
         }
       }
-    });
+    }));
     return parseJSON(response.text || '[]');
   },
 
   async generateQuiz(topic: string, content: string) {
-    const prompt = `Generate a 5-question multiple-choice quiz based on the following topic: "${topic}" and content: "${content.substring(0, 2000)}". Each question should have 4 options and one correct answer. Output in JSON format.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const prompt = `You are an expert quiz generator for ANY subject (technical, non-technical, arts, soft skills, editing, etc.). Generate a 5-question multiple-choice quiz based on the following topic context: "${topic}" and this content: "${content.substring(0, 2000)}". 
+CRITICAL INSTRUCTIONS: 
+- Ensure these questions are UNIQUE and randomly selected from the material (Random Seed: ${Math.random()}). Do NOT generate the exact same questions if asked again.
+- Each question must have exactly 4 options and one correctAnswer. 
+- You MUST generate the quiz regardless of the topic domain.
+- Output ONLY valid JSON, with no markdown formatting outside the JSON array.`;
+    const response = await withRetry((model) => ai.models.generateContent({
+      model,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -171,7 +208,7 @@ For resources, provide specific items formatted exactly as markdown links: "[Res
           }
         }
       }
-    });
+    }));
     return parseJSON(response.text || '[]');
   }
 };
