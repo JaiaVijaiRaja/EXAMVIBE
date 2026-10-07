@@ -53,9 +53,9 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({ progress, onUpdatePr
         }
       });
       showToast('Study plan generated successfully!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to generate study plan. Please try again.', 'error');
+      showToast(error?.message || 'Failed to generate study plan. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

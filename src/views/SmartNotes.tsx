@@ -106,9 +106,9 @@ export const SmartNotes: React.FC<SmartNotesProps> = ({ progress, onUpdateProgre
       const result = await geminiService.generateNotes(topic, type);
       setNotes(result);
       showToast('Notes generated successfully!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to generate notes. Please try again.', 'error');
+      showToast(error?.message || 'Failed to generate notes. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

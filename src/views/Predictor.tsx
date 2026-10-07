@@ -104,9 +104,9 @@ export const Predictor: React.FC<PredictorProps> = ({ progress, onUpdateProgress
       const result = await geminiService.predictQuestions(subject, syllabus);
       setPredictions(result);
       showToast('Exam predictions generated!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to generate predictions. Please try again.', 'error');
+      showToast(error?.message || 'Failed to generate predictions. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

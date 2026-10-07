@@ -59,9 +59,9 @@ export const SkillRoadmap: React.FC<SkillRoadmapProps> = ({ progress, onUpdatePr
       setGoal('');
       setViewingRoadmapId(newId);
       showToast('Roadmap generated successfully!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to generate roadmap. Please try again.', 'error');
+      showToast(error?.message || 'Failed to generate roadmap. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

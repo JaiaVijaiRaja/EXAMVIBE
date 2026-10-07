@@ -41,9 +41,9 @@ export const Challenge: React.FC<ChallengeProps> = ({ progress, onUpdateProgress
         }
       });
       showToast('Challenge sprint created! Good luck.', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to create challenge. Please try again.', 'error');
+      showToast(error?.message || 'Failed to create challenge. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

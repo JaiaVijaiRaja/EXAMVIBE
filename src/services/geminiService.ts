@@ -18,7 +18,7 @@ const parseJSON = (text: string) => {
 };
 
 const withRetry = async <T>(fn: (model: string) => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
-  const models = ['gemini-3.5-flash', 'gemini-3.8-flash'];
+  const models = ['gemini-3.8-flash'];
   let lastError: any = null;
 
   for (const model of models) {
@@ -30,9 +30,8 @@ const withRetry = async <T>(fn: (model: string) => Promise<T>, retries = 3, dela
         return await fn(model);
       } catch (error: any) {
         lastError = error;
-        // Don't retry on 400 (Bad Request / Safety) or 404 (Not Found)
         if (error.status === 400 || error.status === 404) {
-          throw error;
+          throw new Error(`Google API Error (${error.status}): ${error.message || 'Invalid Request or Model not found'}`);
         }
         
         if (currentRetries === 0) break;

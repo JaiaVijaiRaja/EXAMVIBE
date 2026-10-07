@@ -75,9 +75,9 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ progress, onUpdateProgre
       setCurrentIndex(0);
       setIsFlipped(false);
       showToast('Flashcards generated successfully!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to generate flashcards. Please try again.', 'error');
+      showToast(error?.message || 'Failed to generate flashcards. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

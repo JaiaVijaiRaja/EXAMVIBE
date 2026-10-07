@@ -104,9 +104,9 @@ export const AssignmentHelper: React.FC<AssignmentHelperProps> = ({ progress, on
       const result = await geminiService.solveAssignment(question);
       setSolution(result);
       showToast('Solution generated successfully!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showToast('Failed to solve the assignment. Please try again.', 'error');
+      showToast(error?.message || 'Failed to solve the assignment. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
