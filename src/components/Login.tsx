@@ -60,9 +60,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       });
 
       if (signInError) {
-        // If login fails, check if they exist in user_data to give a better error message
+        // If login fails, check if they exist in profiles to give a better error message
         const { data: existingUser } = await supabase
-          .from('user_data')
+          .from('profiles')
           .select('email')
           .eq('email', cleanEmail)
           .maybeSingle();
@@ -78,24 +78,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       // Fetch user info
       const { data: userData } = await supabase
-        .from('user_data')
-        .select('user_info')
+        .from('profiles')
+        .select('*')
         .eq('email', cleanEmail)
         .maybeSingle();
-
-      let userInfo = userData?.user_info;
-      if (typeof userInfo === 'string') {
-        try { userInfo = JSON.parse(userInfo); } catch (e) {}
-      }
 
       const userMetadataName = authData.user?.user_metadata?.name;
       const userMetadataMajor = authData.user?.user_metadata?.major;
 
       onLogin({
-        name: userMetadataName || userInfo?.name || cleanEmail.split('@')[0],
+        name: userMetadataName || userData?.name || cleanEmail.split('@')[0],
         email: cleanEmail,
-        major: userMetadataMajor || userInfo?.major || '',
-        joinedAt: userInfo?.joinedAt || new Date().toISOString()
+        major: userMetadataMajor || userData?.major || '',
+        joinedAt: userData?.created_at || new Date().toISOString()
       });
     } catch (err: any) {
       showError(err.message || 'An unexpected error occurred during login.');
@@ -118,12 +113,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     try {
       // Check if user already exists
       const { data: existingUser } = await supabase
-        .from('user_data')
-        .select('user_info')
+        .from('profiles')
+        .select('email')
         .eq('email', cleanEmail)
         .maybeSingle();
 
-      if (existingUser?.user_info) {
+      if (existingUser) {
         showError('Email ID is already signed up. Please log in.');
         setLoading(false);
         return;

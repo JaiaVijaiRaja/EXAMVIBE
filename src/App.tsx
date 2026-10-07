@@ -71,30 +71,95 @@ const App: React.FC = () => {
     try {
       const cleanEmail = email.toLowerCase().trim();
       
-      // Prepare data for Supabase (stringify objects if the columns are TEXT)
-      const supabaseData: any = {};
-      if (data.user_info) supabaseData.user_info = typeof data.user_info === 'object' ? JSON.stringify(data.user_info) : data.user_info;
-      if (data.exams) supabaseData.exams = typeof data.exams === 'object' ? JSON.stringify(data.exams) : data.exams;
-      if (data.progress) supabaseData.progress = typeof data.progress === 'object' ? JSON.stringify(data.progress) : data.progress;
-      
-      // Try to update first
-      const { data: updateData, error: updateError } = await supabase
-        .from('user_data')
-        .update(supabaseData)
-        .eq('email', cleanEmail)
-        .select();
+      // 1. Sync Profile Data to 'profiles' table
+      if (data.user_info) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert(
+            { 
+              email: cleanEmail, 
+              name: data.user_info.name,
+              major: data.user_info.major || '',
+              updated_at: new Date().toISOString()
+            },
+            { onConflict: 'email' }
+          );
+        if (profileError) console.error('Supabase profile sync error:', profileError);
+      }
 
-      // If no rows were updated, insert
-      if (!updateError && (!updateData || updateData.length === 0)) {
-        const { error: insertError } = await supabase
+      // 2. Sync Exams and Progress to 'user_data' table
+      if (data.exams || data.progress) {
+        const supabaseData: any = {};
+        
+        if (data.exams) {
+          supabaseData.exams = typeof data.exams === 'object' ? JSON.stringify(data.exams) : data.exams;
+        }
+
+        if (data.progress) {
+          const p = data.progress;
+          // Full object dump for strict React state recreation
+          supabaseData.progress = typeof p === 'object' ? JSON.stringify(p) : p;
+
+          // Compute XP and Level
+          const taskCount = Object.keys(p.completedTasks || {}).length;
+          const roadmapCount = Object.keys(p.completedRoadmapWeeks || {}).length;
+          const challengeCount = Object.keys(p.completedChallengeDays || {}).length;
+          const notesCount = Object.keys(p.completedNotes || {}).length;
+          const examPassedCount = Object.keys(p.completedExams || {}).length;
+          const questionsStudied = p.questionsStudied || 0;
+          const streaks = p.streaks || 0;
+
+          const xp = 
+            (taskCount * 10) + 
+            (roadmapCount * 50) + 
+            (challengeCount * 20) + 
+            (notesCount * 5) + 
+            (examPassedCount * 100) + 
+            (questionsStudied * 2) + 
+            (streaks * 15);
+
+          let level = "F-Rank";
+          if (xp >= 4000) level = "S-Rank";
+          else if (xp >= 2000) level = "A-Rank";
+          else if (xp >= 1000) level = "B-Rank";
+          else if (xp >= 600) level = "C-Rank";
+          else if (xp >= 300) level = "D-Rank";
+          else if (xp >= 100) level = "E-Rank";
+
+          // Explode the data into separate columns for Supabase visibility
+          supabaseData.planner = p.savedPlanner ? JSON.stringify(p.savedPlanner) : null;
+          supabaseData.roadmaps = p.savedRoadmaps ? JSON.stringify(p.savedRoadmaps) : null;
+          supabaseData.notes = p.completedNotes ? JSON.stringify(p.completedNotes) : null;
+          supabaseData.flashcards = p.completedFlashcardSets ? JSON.stringify(p.completedFlashcardSets) : null;
+          supabaseData.challenge = p.savedChallenge ? JSON.stringify(p.savedChallenge) : null;
+          supabaseData.assignments = p.completedAssignments ? JSON.stringify(p.completedAssignments) : null;
+          supabaseData.cgpa = p.cgpa || 0;
+          supabaseData.sgpa = p.sgpa || 0;
+          supabaseData.streaks = streaks;
+          supabaseData.best_streak = p.bestStreak || 0;
+          supabaseData.questions_studied = questionsStudied;
+          supabaseData.xp = xp;
+          supabaseData.level = level;
+        }
+        
+        const { data: updateData, error: updateError } = await supabase
           .from('user_data')
-          .insert({ 
-            email: cleanEmail,
-            ...supabaseData
-          });
-        if (insertError) console.error('Supabase insert error:', insertError);
-      } else if (updateError) {
-        console.error('Supabase update error:', updateError);
+          .update(supabaseData)
+          .eq('email', cleanEmail)
+          .select();
+
+        // If no rows were updated, insert
+        if (!updateError && (!updateData || updateData.length === 0)) {
+          const { error: insertError } = await supabase
+            .from('user_data')
+            .insert({ 
+              email: cleanEmail,
+              ...supabaseData
+            });
+          if (insertError) console.error('Supabase insert error:', insertError);
+        } else if (updateError) {
+          console.error('Supabase update error:', updateError);
+        }
       }
     } catch (err) {
       console.error('Failed to sync with Supabase:', err);
