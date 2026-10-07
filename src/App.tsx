@@ -142,23 +142,16 @@ const App: React.FC = () => {
           supabaseData.level = level;
         }
         
-        const { data: updateData, error: updateError } = await supabase
+        const { data: upsertData, error: upsertError } = await supabase
           .from('user_data')
-          .update(supabaseData)
-          .eq('email', cleanEmail)
+          .upsert(
+            { email: cleanEmail, ...supabaseData },
+            { onConflict: 'email' }
+          )
           .select();
 
-        // If no rows were updated, insert
-        if (!updateError && (!updateData || updateData.length === 0)) {
-          const { error: insertError } = await supabase
-            .from('user_data')
-            .insert({ 
-              email: cleanEmail,
-              ...supabaseData
-            });
-          if (insertError) console.error('Supabase insert error:', insertError);
-        } else if (updateError) {
-          console.error('Supabase update error:', updateError);
+        if (upsertError) {
+          console.error('Supabase UPSERT error on user_data:', upsertError);
         }
       }
     } catch (err) {
