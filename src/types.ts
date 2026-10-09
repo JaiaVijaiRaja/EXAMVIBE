@@ -52,6 +52,7 @@ export interface AppProgress {
   streaks?: number;
   bestStreak?: number;
   questionsStudied?: number;
+  manualXpOffset?: number;
   savedRoadmap?: {
     skill: string;
     level: string;

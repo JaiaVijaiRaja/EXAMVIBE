@@ -37,7 +37,7 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
   const sgpa = progress.sgpa || 0;
 
   const getPerformanceData = () => {
-    // Calculate XP (Solo Leveling Style) based on user activities
+    const manualXpOffset = progress.manualXpOffset || 0;
     const totalXP = 
       (taskCount * 10) + 
       (roadmapCount * 50) + 
@@ -45,7 +45,8 @@ export const ReportCardView: React.FC<ReportCardViewProps> = ({ progress, onUpda
       (notesCount * 5) + 
       (examPassedCount * 100) + 
       (questionsStudied * 2) + 
-      (streaks * 15);
+      (streaks * 15) + 
+      manualXpOffset;
 
     const levels = [
       { name: "F-Rank", badge: "F", borderColor: "border-slate-400", textColor: "text-slate-300 dark:text-slate-600" },

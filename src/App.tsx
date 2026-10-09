@@ -116,7 +116,8 @@ const App: React.FC = () => {
             (notesCount * 5) + 
             (examPassedCount * 100) + 
             (questionsStudied * 2) + 
-            (streaks * 15);
+            (streaks * 15) + 
+            (p.manualXpOffset || 0);
 
           let level = "F-Rank";
           if (xp >= 4000) level = "S-Rank";
@@ -212,6 +213,17 @@ const App: React.FC = () => {
           remoteProgress = typeof data.progress === 'string' ? JSON.parse(data.progress) : data.progress;
         }
 
+        const baseRemoteXp = 
+          (Object.keys(remoteProgress.completedTasks || {}).length * 10) + 
+          (Object.keys(remoteProgress.completedRoadmapWeeks || {}).length * 50) + 
+          (Object.keys(remoteProgress.completedChallengeDays || {}).length * 20) + 
+          (Object.keys(remoteProgress.completedNotes || {}).length * 5) + 
+          (Object.keys(remoteProgress.completedExams || {}).length * 100) + 
+          ((remoteProgress.questionsStudied || 0) * 2) + 
+          ((remoteProgress.streaks || 0) * 15);
+
+        const manualXpOffset = (data.xp !== undefined && data.xp !== null) ? (data.xp - baseRemoteXp) : (remoteProgress.manualXpOffset || 0);
+
         // Merge strategy: 
         // 1. If local data is empty/default, use remote data.
         // 2. If both exist, merge them (remote takes precedence for base fields, but we merge collections).
@@ -223,6 +235,31 @@ const App: React.FC = () => {
               mergedExams.push(le);
             }
           });
+        }
+
+        let finalStreaks = Math.max(localProgress.streaks || 0, remoteProgress.streaks || 0);
+        if (data.streaks !== undefined && data.streaks !== (remoteProgress.streaks || 0)) {
+          finalStreaks = data.streaks;
+        }
+
+        let finalBestStreak = Math.max(localProgress.bestStreak || 0, remoteProgress.bestStreak || 0);
+        if (data.best_streak !== undefined && data.best_streak !== (remoteProgress.bestStreak || 0)) {
+          finalBestStreak = data.best_streak;
+        }
+
+        let finalCgpa = localProgress.cgpa || remoteProgress.cgpa || 0;
+        if (data.cgpa !== undefined && data.cgpa !== (remoteProgress.cgpa || 0)) {
+          finalCgpa = data.cgpa;
+        }
+
+        let finalSgpa = localProgress.sgpa || remoteProgress.sgpa || 0;
+        if (data.sgpa !== undefined && data.sgpa !== (remoteProgress.sgpa || 0)) {
+          finalSgpa = data.sgpa;
+        }
+
+        let finalQuestionsStudied = Math.max(localProgress.questionsStudied || 0, remoteProgress.questionsStudied || 0);
+        if (data.questions_studied !== undefined && data.questions_studied !== (remoteProgress.questionsStudied || 0)) {
+          finalQuestionsStudied = data.questions_studied;
         }
 
         const mergedProgress: AppProgress = {
@@ -237,11 +274,12 @@ const App: React.FC = () => {
           completedPredictions: { ...remoteProgress.completedPredictions, ...localProgress.completedPredictions },
           completedFlashcardSets: { ...remoteProgress.completedFlashcardSets, ...localProgress.completedFlashcardSets },
           completedExams: { ...remoteProgress.completedExams, ...localProgress.completedExams },
-          questionsStudied: Math.max(localProgress.questionsStudied || 0, remoteProgress.questionsStudied || 0),
-          streaks: Math.max(localProgress.streaks || 0, remoteProgress.streaks || 0),
-          bestStreak: Math.max(localProgress.bestStreak || 0, remoteProgress.bestStreak || 0),
-          cgpa: localProgress.cgpa || remoteProgress.cgpa || 0,
-          sgpa: localProgress.sgpa || remoteProgress.sgpa || 0,
+          questionsStudied: finalQuestionsStudied,
+          streaks: finalStreaks,
+          bestStreak: finalBestStreak,
+          cgpa: finalCgpa,
+          sgpa: finalSgpa,
+          manualXpOffset: manualXpOffset,
         };
 
         setExams(mergedExams);
